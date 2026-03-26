@@ -1,11 +1,19 @@
 import { createMDX } from 'fumadocs-mdx/next';
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const withMDX = createMDX();
+const appRoot = dirname(fileURLToPath(import.meta.url));
 
 /** @type {import('next').NextConfig} */
 const config = {
   reactStrictMode: true,
   poweredByHeader: false,
+  output: 'standalone',
+  outputFileTracingRoot: appRoot,
+  turbopack: {
+    root: appRoot,
+  },
   experimental: {
     serverActions: {
       allowedOrigins: [
@@ -27,7 +35,7 @@ const config = {
     return [
       {
         // Apply charset to HTML pages
-        source: '/:lang(en|zh|ja)/:path*',
+        source: '/:lang(zh)/:path*',
         headers: [
           {
             key: 'Content-Type',

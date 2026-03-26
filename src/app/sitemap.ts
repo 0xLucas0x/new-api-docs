@@ -44,21 +44,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     return alternates;
   }
 
-  // Track lastModified per language for homepages (more meaningful than "now")
-  const latestModifiedByLang = new Map<string, Date>();
-
-  // Add homepage for each language with alternates
-  for (const lang of i18n.languages) {
-    entries.push({
-      url: `${url}${getLocalePath(lang)}`,
-      changeFrequency: 'daily',
-      priority: 1.0,
-      alternates: {
-        languages: generateAlternates(i18n.languages, ''),
-      },
-    });
-  }
-
   // Create a map to group pages by slug across languages
   const pagesBySlug = new Map<
     string,
@@ -74,24 +59,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
         pagesBySlug.set(slugKey, []);
       }
       pagesBySlug.get(slugKey)!.push({ lang, page });
-
-      const lm = toDate(page.data.lastModified);
-      if (lm) {
-        const prev = latestModifiedByLang.get(lang);
-        if (!prev || lm.getTime() > prev.getTime()) {
-          latestModifiedByLang.set(lang, lm);
-        }
-      }
     }
-  }
-
-  // Backfill homepage lastModified with latest docs update per language (if any)
-  for (const entry of entries) {
-    // entry.url is always like `${url}/${lang}` here
-    const match = entry.url.replace(url, '').split('/').filter(Boolean)[0];
-    if (!match) continue;
-    const lm = latestModifiedByLang.get(match);
-    if (lm) entry.lastModified = lm;
   }
 
   // Add docs pages with proper alternates and lastModified
@@ -107,23 +75,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
       const depth = page.slugs.length;
       let priority: number;
       if (depth === 1) {
-        priority = 0.9; // Top-level pages (e.g., /docs/guide)
+        priority = 1.0;
       } else if (depth === 2) {
-        priority = 0.8; // Second-level pages
+        priority = 0.85;
       } else {
-        priority = 0.7; // Deeper pages
+        priority = 0.75;
       }
-
-      // Determine change frequency based on page type
-      const isApiPage = page.slugs[0] === 'api';
-      const changeFrequency: 'daily' | 'weekly' | 'monthly' = isApiPage
-        ? 'monthly'
-        : 'weekly';
 
       entries.push({
         url: `${url}${getLocalePath(lang, docsPath)}`,
         ...(lastModified ? { lastModified } : {}),
-        changeFrequency,
+        changeFrequency: depth <= 2 ? 'weekly' : 'monthly',
         priority,
         alternates: {
           languages: generateAlternates(availableLangs, docsPath),

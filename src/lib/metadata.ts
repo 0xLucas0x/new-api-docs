@@ -1,8 +1,12 @@
 import type { Metadata } from 'next';
 
 export function createMetadata(override: Metadata): Metadata {
+  const metadataBase =
+    override.metadataBase instanceof URL ? override.metadataBase : baseUrl;
+
   return {
     ...override,
+    metadataBase,
     icons: {
       icon: '/favicon.ico',
       shortcut: '/favicon.ico',
@@ -11,7 +15,7 @@ export function createMetadata(override: Metadata): Metadata {
     openGraph: {
       title: override.title ?? undefined,
       description: override.description ?? undefined,
-      url: 'https://www.newapi.ai',
+      url: metadataBase.origin,
       images: '/assets/logo.png',
       siteName: 'New API',
       type: 'website',
@@ -27,8 +31,13 @@ export function createMetadata(override: Metadata): Metadata {
   };
 }
 
-export const baseUrl =
-  process.env.NODE_ENV === 'development' ||
-  !process.env.VERCEL_PROJECT_PRODUCTION_URL
-    ? new URL('http://localhost:3000')
-    : new URL(`https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`);
+const configuredSiteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  process.env.SITE_URL ||
+  (process.env.NODE_ENV === 'development'
+    ? 'http://localhost:3000'
+    : process.env.VERCEL_PROJECT_PRODUCTION_URL
+      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+      : 'http://localhost:3000');
+
+export const baseUrl = new URL(configuredSiteUrl);

@@ -5,7 +5,7 @@ import {
   DocsPage,
   DocsTitle,
 } from 'fumadocs-ui/page';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { getMDXComponents } from '@/mdx-components';
 import type { Metadata } from 'next';
 import { createRelativeLink } from 'fumadocs-ui/mdx';
@@ -22,6 +22,12 @@ export default async function Page(props: {
   params: Promise<{ lang: string; slug?: string[] }>;
 }) {
   const { slug, lang } = await props.params;
+  const apiRoot = `/${lang}/docs/api`;
+
+  if (!slug || slug.length === 0 || slug[0] !== 'api') {
+    redirect(apiRoot);
+  }
+
   const page = source.getPage(slug, lang);
   if (!page) notFound();
 
@@ -40,10 +46,10 @@ export default async function Page(props: {
       }}
     >
       <DocsTitle>{page.data.title}</DocsTitle>
-      <DocsDescription className="mb-2">
+      <DocsDescription className="docs-page-description mb-2">
         {page.data.description}
       </DocsDescription>
-      <div className="mb-6 flex flex-row flex-wrap items-center gap-2 border-b pb-6">
+      <div className="docs-page-toolbar mb-6 flex flex-row flex-wrap items-center gap-2 pb-6">
         <LLMCopyButton
           markdownUrl={`/${lang}/llms.mdx/${page.slugs.join('/')}`}
           lang={lang}
@@ -54,12 +60,14 @@ export default async function Page(props: {
           lang={lang}
         />
       </div>
-      <DocsBody>
-        <MDX
-          components={getMDXComponents({
-            a: createRelativeLink(source, page) as any,
-          })}
-        />
+      <DocsBody className="docs-page-body">
+        <div className="docs-page-panel">
+          <MDX
+            components={getMDXComponents({
+              a: createRelativeLink(source, page) as any,
+            })}
+          />
+        </div>
       </DocsBody>
       <Feedback lang={lang} onRateAction={onRateAction} />
     </DocsPage>
@@ -74,6 +82,11 @@ export async function generateMetadata(props: {
   params: Promise<{ lang: string; slug?: string[] }>;
 }): Promise<Metadata> {
   const { slug, lang } = await props.params;
+  if (!slug || slug.length === 0 || slug[0] !== 'api') {
+    return {
+      title: 'API Reference',
+    };
+  }
   const page = source.getPage(slug, lang);
   if (!page) notFound();
 

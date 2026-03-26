@@ -8,9 +8,6 @@ import { notFound } from 'next/navigation';
 
 const { provider } = defineI18nUI(i18n, {
   translations: {
-    en: {
-      displayName: 'English',
-    },
     zh: {
       displayName: '简体中文',
       search: '搜索文档',
@@ -23,18 +20,6 @@ const { provider } = defineI18nUI(i18n, {
       previousPage: '上一页',
       tocNoHeadings: '目录为空',
     },
-    ja: {
-      displayName: '日本語',
-      search: 'ドキュメントを検索',
-      searchNoResult: '結果が見つかりません',
-      toc: '目次',
-      lastUpdate: '最終更新',
-      chooseTheme: 'テーマを選択',
-      chooseLanguage: '言語を選択',
-      nextPage: '次のページ',
-      previousPage: '前のページ',
-      tocNoHeadings: '見出しがありません',
-    },
   },
 });
 
@@ -42,23 +27,11 @@ const titleMap: Record<
   string,
   { default: string; template: string; description: string }
 > = {
-  en: {
-    default: 'New API - The Foundation of Your AI Universe',
-    template: '%s | New API',
-    description:
-      'Connect all AI providers, manage your AI assets, and build the future on a unified infrastructure platform. Deploy in minutes, scale effortlessly.',
-  },
   zh: {
-    default: 'New API - AI 基座',
-    template: '%s | New API',
+    default: 'New API API 参考',
+    template: '%s | New API API 参考',
     description:
-      '承载所有 AI 应用，管理你的数字资产，连接未来的统一基础设施平台。快速部署，轻松扩展。',
-  },
-  ja: {
-    default: 'New API - あなたの AI ユニバースの基盤',
-    template: '%s | New API',
-    description:
-      'すべての AI プロバイダーを接続し、AI アセットを管理し、統一されたインフラストラクチャプラットフォームで未来を構築。数分でデプロイ、簡単にスケール。',
+      'New API 完整 API 参考，覆盖 AI 模型接口与管理接口。',
   },
 };
 
@@ -68,7 +41,7 @@ export async function generateMetadata({
   params: Promise<{ lang: string }>;
 }): Promise<Metadata> {
   const lang = (await params).lang;
-  const titles = titleMap[lang] || titleMap.en;
+  const titles = titleMap[lang] || titleMap.zh;
 
   return createMetadata({
     metadataBase: baseUrl,
@@ -78,16 +51,14 @@ export async function generateMetadata({
     },
     description: titles.description,
     keywords: [
-      'AI Infrastructure',
+      'New API',
+      'API Reference',
+      'OpenAI Compatible',
       'AI Gateway',
-      'AI Asset Management',
-      'API Orchestration',
-      'AI Application Platform',
-      'Multi-Model Integration',
-      'Enterprise AI',
-      'AI Ecosystem',
-      'Unified AI Interface',
-      'Intelligent API Management',
+      'Chat Completions',
+      'Embeddings',
+      'Management API',
+      'OpenAPI',
     ],
     authors: [
       { name: 'New API Team', url: 'https://github.com/QuantumNous/new-api' },
@@ -95,9 +66,7 @@ export async function generateMetadata({
     creator: 'New API Team',
     alternates: {
       languages: {
-        en: '/en',
-        zh: '/zh',
-        ja: '/ja',
+        zh: '/zh/docs/api',
       },
     },
     openGraph: {
@@ -134,7 +103,7 @@ export default async function RootLayout({
   }
 
   return (
-    <Provider i18n={provider(lang)} lang={lang}>
+    <Provider i18n={provider(lang)}>
       {children}
     </Provider>
   );

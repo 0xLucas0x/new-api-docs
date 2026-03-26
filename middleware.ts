@@ -1,7 +1,25 @@
 import { createI18nMiddleware } from 'fumadocs-core/i18n/middleware';
+import {
+  NextResponse,
+  type NextFetchEvent,
+  type NextRequest,
+} from 'next/server';
 import { i18n } from '@/lib/i18n';
 
-export default createI18nMiddleware(i18n);
+const i18nMiddleware = createI18nMiddleware(i18n);
+
+export default function middleware(
+  request: NextRequest,
+  event: NextFetchEvent
+) {
+  if (request.nextUrl.pathname === '/') {
+    const url = request.nextUrl.clone();
+    url.pathname = `/${i18n.defaultLanguage}/docs/api`;
+    return NextResponse.redirect(url);
+  }
+
+  return i18nMiddleware(request, event);
+}
 
 export const config = {
   // Matcher ignoring API routes, Next.js internals, and static assets
