@@ -27,6 +27,9 @@ export default async function Page(props: {
   if (!slug || slug.length === 0 || slug[0] !== 'api') {
     redirect(apiRoot);
   }
+  if (slug.length > 1 && slug[1] !== 'ai-model') {
+    redirect(apiRoot);
+  }
 
   const page = source.getPage(slug, lang);
   if (!page) notFound();
@@ -82,7 +85,12 @@ export async function generateMetadata(props: {
   params: Promise<{ lang: string; slug?: string[] }>;
 }): Promise<Metadata> {
   const { slug, lang } = await props.params;
-  if (!slug || slug.length === 0 || slug[0] !== 'api') {
+  if (
+    !slug ||
+    slug.length === 0 ||
+    slug[0] !== 'api' ||
+    (slug.length > 1 && slug[1] !== 'ai-model')
+  ) {
     return {
       title: 'API Reference',
     };

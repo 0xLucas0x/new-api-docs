@@ -31,7 +31,7 @@ const titleMap: Record<
     default: 'New API API 参考',
     template: '%s | New API API 参考',
     description:
-      'New API 完整 API 参考，覆盖 AI 模型接口与管理接口。',
+      'New API AI 模型 API 参考，覆盖聊天、嵌入、审查、音频、图像与视频接口。',
   },
 };
 
@@ -57,7 +57,9 @@ export async function generateMetadata({
       'AI Gateway',
       'Chat Completions',
       'Embeddings',
-      'Management API',
+      'Image Generation',
+      'Audio API',
+      'Video API',
       'OpenAPI',
     ],
     authors: [
@@ -102,9 +104,5 @@ export default async function RootLayout({
     notFound();
   }
 
-  return (
-    <Provider i18n={provider(lang)}>
-      {children}
-    </Provider>
-  );
+  return <Provider i18n={provider(lang)}>{children}</Provider>;
 }

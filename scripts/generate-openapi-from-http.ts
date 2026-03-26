@@ -350,12 +350,12 @@ function normalizeMethod(method: string): string {
   return method.trim().toLowerCase();
 }
 
-function groupByModuleId(moduleId?: number) {
+function groupByModuleId(moduleId?: number): 'ai-model' | null {
   // From observed data:
   // - 6656265: AI 模型接口
   // - 6660656: 后台管理接口
-  if (moduleId === 6660656) return 'management';
-  return 'ai-model';
+  if (moduleId === 6656265) return 'ai-model';
+  return null;
 }
 
 async function readHttpSource(): Promise<HttpTxtRoot> {
@@ -497,6 +497,7 @@ async function main() {
 
   for (const ep of root.data) {
     const group = groupByModuleId(ep.moduleId);
+    if (!group) continue;
     const tags = (ep.tags && ep.tags.length > 0 ? ep.tags : ['default']).map(
       (t) => t || 'default'
     );
